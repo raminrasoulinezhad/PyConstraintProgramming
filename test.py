@@ -141,9 +141,101 @@ print("Total number of ways: {}".format(len(solutions)))
 
 
 ############################################
+# Example D - I did not understand what is the example
+############################################
+
+
+############################################
 # Example D
+############################################
+'''
+You wish to pack chocolates for your mother. 
+Your goal is to bring her the sweetest chocolate possible, 
+that you can pack in your bag and sneak through security, 
+and that wouldn't pass a certain net value for which you'd 
+go to prison if you got caught.
+Security most likely won't get suspicious if you bring less 
+than 3kg. You can fit 1 dm^3 of chocolate in your bag. 
+You won't go to jail if you steal less than $300 worth 
+of chocolate.
+'''
+
+problem = constraint.Problem()
+max_price = 30
+max_space = 1000
+max_weight = 3000
+
+problem.addVariable('A', range(int(max_price//8) + 1))
+problem.addVariable('B', range(int(max_price//6.8) + 1))
+problem.addVariable('C', range(int(max_price//4) + 1))
+problem.addVariable('D', range(int(max_price//3) + 1))
+
+# We have 3kg = 3,000g available
+def weight_constraint(a, b, c, d):
+    if (a*100 + b*45 + c*10 + d*25) <= max_weight:
+        return True
+
+# We have 1dm^3 = 1,000cm^3 available
+def volume_constraint(a, b, c, d):
+    if (a*8*2.5*0.5 + b*6*2*0.5 * c*2*2*0.5 + d*3*3*0.5) <= max_space:
+        return True
+
+# We can't exceed $300
+def value_constraint(a, b, c, d):
+    if (a*8 + b*6.8 + c*4 + d*3) < max_price:
+        return True
+
+problem.addConstraint(weight_constraint, "ABCD")
+problem.addConstraint(volume_constraint, "ABCD")
+problem.addConstraint(value_constraint, "ABCD")
+
+maximum_sweetness = 0
+solution_found = {}
+solutions = problem.getSolutions()
+
+for s in solutions:
+    current_sweetness = s['A']*10 + s['B']*8 + s['C']*4.5 + s['D']*3.5
+    if current_sweetness > maximum_sweetness:
+        maximum_sweetness = current_sweetness
+        solution_found = s
+
+print("""
+The maximum sweetness we can bring is: {}
+We'll bring:
+{} A Chocolates,
+{} B Chocolates,
+{} C Chocolates,
+{} D Chocolates
+""".format(maximum_sweetness, solution_found['A'], solution_found['B'], solution_found['C'], solution_found['D']))
+
+
+############################################
+# Example E - I did not try this case
 ############################################
 
 
 
+############################################
+# Example extra example
+############################################
+'''
+Generate all combinations (that have a length equal to the number of keys) of values stored in a dictionary (the order of output doesn't matter). The dictionary is {String : List_of_Strings}. In such a way that every combination has exactly one value from the List_of_Strings of a key.
 
+You don't know the number of keys in the dictionary in advance, nor do you know how long a List_of_String is, every List_of_String can be of different length. I.e. the dictionary is dynamically generated via user input.
+
+Example input: dictionary = {"A" : [1,2], "B" -> [4], "C" -> [5,6,7], "D" -> [8,9]}
+Example output: (1,4,5,8), (1,4,5,9), (1,4,6,8), (1,4,6,9), (1,4,7,8)....
+'''
+
+# input example
+generated_dictionary = {'A' : [1,2], 'B' : [4], 'C' : [5,6,7], 'D' : [8,9]}
+
+problem = constraint.Problem()
+
+for key, value in generated_dictionary.items():
+    problem.addVariable(key, value)
+
+solutions = problem.getSolutions()
+
+for solution in solutions:
+    print(solution)
